@@ -1,7 +1,7 @@
 from typing import Union
 
 
-class WallexExceptions(Exception):
+class WallexExceptions(BaseException):
     def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
         self.func_name = func_name
         self.message = str(message)
