@@ -34,7 +34,7 @@ def get_token(email: str, password: str) -> str:
         try:
             resp = r.json()
         except JSONDecodeError as e:
-            raise JsonDecodingError(func_name, e, _)
+            raise JsonDecodingError(func_name, r.text, _)
 
         if validate_response(resp):
             return resp.get('result').get('token')
@@ -68,7 +68,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result')
@@ -92,7 +92,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result').get('symbols').get(symbol.upper())
@@ -116,7 +116,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result')
@@ -140,7 +140,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result').get('balances')
@@ -165,7 +165,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result').get('balances').get(coin)
@@ -190,7 +190,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 _ = resp.get('result').get('balances').get(coin)
@@ -227,7 +227,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result')
@@ -255,7 +255,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result')
@@ -280,7 +280,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result').get('orders')
@@ -305,7 +305,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 all_orders = resp.get('result').get('orders')
@@ -346,7 +346,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result').get('AccountLatestTrades')
@@ -371,7 +371,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result')
@@ -406,7 +406,7 @@ class Wallex:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, e, _)
+                raise JsonDecodingError(func_name, r.text, _)
 
             if validate_response(resp):
                 return resp.get('result')
