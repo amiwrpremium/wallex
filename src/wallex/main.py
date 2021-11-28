@@ -203,7 +203,7 @@ class Wallex:
         else:
             raise StatusCodeError(func_name, status_code, r.text, _)
 
-    def create_order(self, price: str, quantity: str, side: str, symbol: str, type_: str, order_id: str = None):
+    def create_order(self, price: str, quantity: str, side: str, symbol: str, type_: str, client_id: str = None):
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
 
@@ -215,8 +215,8 @@ class Wallex:
                 "symbol": symbol.upper(),
                 "type": type_.lower(),
             }
-            if order_id:
-                payload.update({'order_id': order_id})
+            if client_id:
+                payload.update({'client_id': client_id})
             payload = json.dumps(payload)
 
             r = self.session.post(self.base_url + 'account/orders', data=payload, timeout=5, verify=self.verify)
