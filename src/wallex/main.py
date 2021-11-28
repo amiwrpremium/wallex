@@ -47,18 +47,20 @@ def get_token(email: str, password: str) -> str:
 class Wallex:
     def __init__(self, token: str):
         self.base_url = "https://wallex.ir/api/v2/"
+        self.verify = None
         self.session = requests.Session()
         self.session.headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {token}'
+            'Authorization': f'Bearer {token}',
+            'Accept': 'application/json',
+            'host': 'wallex.ir',
         }
-        pass
 
     def all_market_stats(self):
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
         try:
-            r = self.session.get(self.base_url + 'markets', timeout=5)
+            r = self.session.get(self.base_url + 'markets', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -82,7 +84,7 @@ class Wallex:
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
         try:
-            r = self.session.get(self.base_url + 'markets', timeout=5)
+            r = self.session.get(self.base_url + 'markets', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -106,7 +108,7 @@ class Wallex:
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
         try:
-            r = self.session.get(self.base_url + f'depth?symbol={symbol.upper()}', timeout=5)
+            r = self.session.get(self.base_url + f'depth?symbol={symbol.upper()}', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -130,7 +132,7 @@ class Wallex:
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
         try:
-            r = self.session.get(self.base_url + 'account/balances', timeout=5)
+            r = self.session.get(self.base_url + 'account/balances', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -155,7 +157,7 @@ class Wallex:
         coin = coin.upper()
         func_name = inspect.currentframe().f_code.co_name
         try:
-            r = self.session.get(self.base_url + 'account/balances', timeout=5)
+            r = self.session.get(self.base_url + 'account/balances', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -180,7 +182,7 @@ class Wallex:
         coin = coin.upper()
         func_name = inspect.currentframe().f_code.co_name
         try:
-            r = self.session.get(self.base_url + 'account/balances', timeout=5)
+            r = self.session.get(self.base_url + 'account/balances', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -217,7 +219,7 @@ class Wallex:
                 payload.update({'order_id': order_id})
             payload = json.dumps(payload)
 
-            r = self.session.post(self.base_url + 'account/orders', data=payload, timeout=5)
+            r = self.session.post(self.base_url + 'account/orders', data=payload, timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -245,7 +247,7 @@ class Wallex:
             payload = json.dumps({
                 "clientOrderId": client_id
             })
-            r = self.session.delete(self.base_url + 'account/orders', data=payload, timeout=5)
+            r = self.session.delete(self.base_url + 'account/orders', data=payload, timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -270,7 +272,7 @@ class Wallex:
         func_name = inspect.currentframe().f_code.co_name
 
         try:
-            r = self.session.get(self.base_url + f'account/openOrders?symbol={symbol.upper()}', timeout=5)
+            r = self.session.get(self.base_url + f'account/openOrders?symbol={symbol.upper()}', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -295,7 +297,7 @@ class Wallex:
         func_name = inspect.currentframe().f_code.co_name
 
         try:
-            r = self.session.get(self.base_url + f'account/openOrders?symbol={symbol.upper()}', timeout=5)
+            r = self.session.get(self.base_url + f'account/openOrders?symbol={symbol.upper()}', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -336,7 +338,7 @@ class Wallex:
             params.update({'active': active})
 
         try:
-            r = self.session.get(self.base_url + f'account/trades', params=params, timeout=5)
+            r = self.session.get(self.base_url + f'account/trades', params=params, timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -361,7 +363,7 @@ class Wallex:
         func_name = inspect.currentframe().f_code.co_name
 
         try:
-            r = self.session.get(self.base_url + f'account/orders/{order_id}', timeout=5)
+            r = self.session.get(self.base_url + f'account/orders/{order_id}', timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
@@ -396,7 +398,7 @@ class Wallex:
             if tag:
                 payload.update({'tag': tag})
             payload = json.dumps(payload)
-            r = self.session.post(self.base_url + f'account/crypto-withdrawal', data=payload, timeout=5)
+            r = self.session.post(self.base_url + f'account/crypto-withdrawal', data=payload, timeout=5, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
