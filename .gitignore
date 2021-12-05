@@ -6,3 +6,4 @@ src/__pycache__
 *.logs
 *.db
 .idea
+.DS_Store

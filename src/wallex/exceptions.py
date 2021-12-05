@@ -1,7 +1,7 @@
 from typing import Union
 
 
-class WallexExceptions(BaseException):
+class WallexExceptions(Exception):
     def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
         self.func_name = func_name
         self.message = str(message)
@@ -13,7 +13,14 @@ class WallexExceptions(BaseException):
 
 
 class RequestsExceptions(WallexExceptions):
-    pass
+    def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
+        self.func_name = func_name
+        self.message = message
+        self._args = args
+        super().__init__(func_name, message, args)
+
+    def __str__(self):
+        return f'{self.func_name} -> {self.message} | {str(self._args)}'
 
 
 class StatusCodeError(WallexExceptions):
