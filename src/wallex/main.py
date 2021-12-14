@@ -11,13 +11,14 @@ def validate_response(response: dict) -> bool:
     return response.get('success') or str(response.get('success')).lower() == 'true'
 
 
-def get_token(email: str, password: str) -> str:
+def get_token(email: str, password: str, remember: bool = False) -> str:
     _ = locals()
     func_name = inspect.currentframe().f_code.co_name
 
     payload = json.dumps({
         "email": email,
-        "password": password
+        "password": password,
+        'remember': remember
     })
     headers = {
         'Content-Type': 'application/json'
