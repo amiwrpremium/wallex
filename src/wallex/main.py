@@ -1,5 +1,3 @@
-from typing import Union
-
 import inspect
 
 import requests
@@ -27,13 +25,13 @@ def get_token(email: str, password: str, remember: bool = False) -> str:
     }
 
     try:
-        r = requests.post('https://wallex.ir/api/v2/login', headers=headers, data=payload, timeout=5)
+        r = requests.post('https://api.wallex.ir/auth/login/email', headers=headers, data=payload, timeout=5)
     except Exception as e:
         raise RequestsExceptions(func_name, e, _)
 
     status_code = r.status_code
 
-    if status_code == 200 or status_code == 201:
+    if 200 <= status_code < 300:
         try:
             resp = r.json()
         except JSONDecodeError as e:
@@ -49,7 +47,7 @@ def get_token(email: str, password: str, remember: bool = False) -> str:
 
 class Wallex:
     def __init__(self, token: str, timeout: int = 5, verify: Union[bool, None] = None):
-        self.base_url = "https://wallex.ir/api/v2/"
+        self.base_url = "https://api.wallex.ir/v1/"
         self.verify = verify
         self.timeout = timeout
         self.session = requests.Session()
@@ -57,7 +55,6 @@ class Wallex:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {token}',
             'Accept': 'application/json',
-            'host': 'wallex.ir',
         }
 
     def all_market_stats(self):
@@ -71,7 +68,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -96,7 +93,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -121,7 +118,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -146,7 +143,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -172,7 +169,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -198,7 +195,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -236,7 +233,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -265,7 +262,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -291,7 +288,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -317,7 +314,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -359,7 +356,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -385,7 +382,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
@@ -421,7 +418,7 @@ class Wallex:
 
         status_code = r.status_code
 
-        if status_code == 200 or status_code == 201:
+        if 200 <= status_code < 300:
             try:
                 resp = r.json()
             except JSONDecodeError as e:
