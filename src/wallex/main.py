@@ -396,7 +396,7 @@ class Wallex:
         else:
             raise StatusCodeError(func_name, status_code, r.text, _)
 
-    def withdraw(self, coin: str, client_unique_id: str, network: str, amount: str, address: str, tag: str = None):
+    def withdraw(self, coin: str, client_unique_id: str, network: str, amount: str, address: str, memo: str = None):
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
 
@@ -408,8 +408,8 @@ class Wallex:
                 "value": str(amount),
                 "wallet_address": address,
             }
-            if tag:
-                payload.update({'tag': tag})
+            if memo:
+                payload.update({'memo': memo})
             payload = json.dumps(payload)
             r = self.session.post(self.base_url + f'account/crypto-withdrawal', data=payload,
                                   timeout=self.timeout, verify=self.verify)
