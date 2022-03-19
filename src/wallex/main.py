@@ -276,13 +276,16 @@ class Wallex:
         else:
             raise StatusCodeError(func_name, status_code, r.text, _)
 
-    def open_orders(self, symbol: str):
+    def open_orders(self, symbol: str = None):
         _ = locals()
         func_name = inspect.currentframe().f_code.co_name
 
+        url = f'account/openOrders'
+        if symbol is not None:
+            url += f'?symbol={symbol.upper()}'
+
         try:
-            r = self.session.get(self.base_url + f'account/openOrders?symbol={symbol.upper()}',
-                                 timeout=self.timeout, verify=self.verify)
+            r = self.session.get(self.base_url + url, timeout=self.timeout, verify=self.verify)
         except Exception as e:
             raise RequestsExceptions(func_name, e, _)
 
