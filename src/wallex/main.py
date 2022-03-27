@@ -1,346 +1,497 @@
-import inspect
+from inspect import currentframe as cf
+import typing as t
 
 import requests
-from simplejson import JSONDecodeError
-import json
+
 
 from .exceptions import *
-
-
-def validate_response(response: dict) -> bool:
-    return response.get('success') or str(response.get('success')).lower() == 'true'
-
-
-def get_token(email: str, password: str, remember: bool = False) -> str:
-    _ = locals()
-    func_name = inspect.currentframe().f_code.co_name
-
-    payload = json.dumps({
-        "email": email,
-        "password": password,
-        'remember': remember
-    })
-    headers = {
-        'Content-Type': 'application/json'
-    }
-
-    try:
-        r = requests.post('https://api.wallex.ir/auth/login/email', headers=headers, data=payload, timeout=5)
-    except Exception as e:
-        raise RequestsExceptions(func_name, e, _)
-
-    status_code = r.status_code
-
-    if 200 <= status_code < 300:
-        try:
-            resp = r.json()
-        except JSONDecodeError as e:
-            raise JsonDecodingError(func_name, r.text, _)
-
-        if validate_response(resp):
-            return resp.get('result').get('token')
-        else:
-            raise JsonDecodingError(func_name, r.text, _)
-    else:
-        raise StatusCodeError(func_name, status_code, r.text, _)
+from ._package_data import __version__, __author__
 
 
 class Wallex:
-    def __init__(self, token: str, timeout: int = 5, verify: Union[bool, None] = None):
-        self.base_url = "https://api.wallex.ir/v1/"
-        self.verify = verify
-        self.timeout = timeout
-        self.session = requests.Session()
-        self.session.headers = {
+    """
+    Wallex API wrapper.
+    """
+
+    MARKET_ORDER = 'market'
+    LIMIT_ORDER = 'limit'
+    STOP_LIMIT_ORDER = 'stop_limit'
+    STOP_MARKET_ORDER = 'stop_market'
+
+    BUY_ORDER = 'buy'
+    SELL_ORDER = 'sell'
+
+    def __init__(self, token: t.Optional[str] = None, requests_params: t.Optional[t.Dict] = None):
+        self.__base_url = "https://api.wallex.ir/v1/"
+        self.__requests_params = requests_params
+        self.__token = token
+
+        self.__headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {token}',
             'Accept': 'application/json',
         }
 
-    def all_market_stats(self):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
-        try:
-            r = self.session.get(self.base_url + 'markets',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+        if self.__token:
+            self.__headers['Authorization'] = 'Bearer ' + self.__token
 
-        status_code = r.status_code
+        if self.__requests_params:
+            if 'headers' in self.__requests_params.keys():
+                self.__headers.update(self.__requests_params.get('headers'))
 
-        if 200 <= status_code < 300:
+        return
+
+    @staticmethod
+    def __get_func_args(all_locals: t.Dict, remove_keys: t.Optional[t.List[str]] = None) -> t.Dict:
+        """
+        Get function arguments.
+
+        :param all_locals: All locals
+        :type all_locals: dict
+
+        :return: Function arguments
+        :rtype: dict
+        """
+
+        if remove_keys is None:
+            remove_keys = ['self']
+
+        if 'self' not in remove_keys:
+            remove_keys.append('self')
+
+        for i in remove_keys:
             try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+                all_locals.pop(i)
+            except KeyError:
+                pass
 
-            if validate_response(resp):
-                return resp.get('result')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
+        return all_locals
 
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
+    def __make_headers(self, func_name: str, auth: t.Optional[bool] = True) -> t.Dict:
+        """
+        Make headers.
 
-    def symbol_market_stats(self, symbol: str):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
-        try:
-            r = self.session.get(self.base_url + 'markets',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+        :param func_name: Function name
+        :type func_name: str
 
-        status_code = r.status_code
+        :param auth: Authorization (optional)
+        :type auth: bool
 
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+        :return: Headers
+        :rtype: dict
+        """
 
-            if validate_response(resp):
-                return resp.get('result').get('symbols').get(symbol.upper())
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
+        f_args = self.__get_func_args(locals())
+        headers = self.__headers.copy()
 
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def order_book(self, symbol: str):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
-        try:
-            r = self.session.get(self.base_url + f'depth?symbol={symbol.upper()}',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
-
-        status_code = r.status_code
-
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
-
-            if validate_response(resp):
-                return resp.get('result')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def all_balances(self):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
-        try:
-            r = self.session.get(self.base_url + 'account/balances',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
-
-        status_code = r.status_code
-
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
-
-            if validate_response(resp):
-                return resp.get('result').get('balances')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def coin_balance(self, coin: str):
-        _ = locals()
-        coin = coin.upper()
-        func_name = inspect.currentframe().f_code.co_name
-        try:
-            r = self.session.get(self.base_url + 'account/balances',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
-
-        status_code = r.status_code
-
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
-
-            if validate_response(resp):
-                return resp.get('result').get('balances').get(coin)
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def coin_available_balance(self, coin: str):
-        _ = locals()
-        coin = coin.upper()
-        func_name = inspect.currentframe().f_code.co_name
-        try:
-            r = self.session.get(self.base_url + 'account/balances',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
-
-        status_code = r.status_code
-
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
-
-            if validate_response(resp):
-                _ = resp.get('result').get('balances').get(coin)
-                return float(_.get('value')) - float(_.get('locked'))
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def create_order(self, price: str, quantity: str, side: str, symbol: str, type_: str, client_id: str = None):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
-
-        try:
-            payload = {
-                "price": price,
-                "quantity": quantity,
-                "side": side.lower(),
-                "symbol": symbol.upper(),
-                "type": type_.lower(),
-            }
-            if client_id:
-                payload.update({'client_id': client_id})
-            payload = json.dumps(payload)
-
-            r = self.session.post(self.base_url + 'account/orders', data=payload,
-                                  timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
-
-        status_code = r.status_code
-
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
-
-            if validate_response(resp):
-                return resp.get('result')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def cancel_order(self, client_id: str):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
-
-        try:
-            payload = json.dumps({
-                "clientOrderId": client_id
+        if auth is True:
+            if self.__token is None:
+                raise TokenException(
+                    func_name,
+                    'access_token is None',
+                    f_args=f_args
+                )
+            headers.update({
+                'Authorization': f'Bearer {self.__token}'
             })
-            r = self.session.delete(self.base_url + 'account/orders', data=payload,
-                                    timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
 
-        status_code = r.status_code
+        return headers
 
-        if 200 <= status_code < 300:
+    @staticmethod
+    def __validate_response(f_name: str, response: t.Dict) -> bool:
+        _ = response.get('success') is True or str(response.get('success')).lower() == 'true'
+
+        if _ is False:
+            raise InvalidResponse(
+                f_name,
+                'invalid response',
+                response_json=response
+            )
+
+        return _
+
+    def set_token(self, token: str) -> str:
+        """
+        Set token
+
+        :param token: Token
+        :type token: str
+
+        :return: Token
+        :rtype: str
+        """
+
+        self.__token = token
+        return self.__token
+
+    def _process_response(
+            self,
+            func_name: str,
+            response: requests.Response,
+            additional: t.Optional[t.Dict] = None,
+    ) -> t.Dict:
+        """
+        Check response for exceptions.
+
+        :param response: Response
+        :type response: requests.Response
+
+        :param func_name: Function name
+        :type func_name: str
+
+        :raises: WallexExceptions
+
+        :return: None
+        :rtype: None
+        """
+
+        if additional is not None:
+            additional.update(self.__get_func_args(locals()))
+
+        if 200 <= response.status_code < 300:
             try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
-
-            if validate_response(resp):
-                return resp.get('result')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
+                r_json: t.Dict = response.json()
+            except Exception as e:
+                raise JSONDecodingError(
+                    func_name=func_name,
+                    message='Could not decode JSON',
+                    response=response,
+                )
 
         else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
+            raise StatusCodeError(
+                func_name,
+                f'invalid status code',
+                response=response,
+                additional=additional
+            )
 
-    def open_orders(self, symbol: str = None):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
+        self.__validate_response(func_name, r_json)
+
+        return r_json
+
+    def _request(
+            self, func_name: str, method: str, url: str, auth: t.Optional[bool] = False,
+            params: t.Optional[t.Dict] = None, data: t.Optional[t.Dict] = None, json_data: t.Optional[t.Dict] = None,
+    ) -> requests.Response:
+        """
+        Make a request to the Bitpin API.
+
+        :param method: HTTP method
+        :type method: str
+
+        :param url: URL
+        :type url: str
+
+        :param auth: Whether to use authentication (optional)
+        :type auth: bool
+
+        :param params: Query parameters (optional)
+        :type params: dict
+
+        :param data: Request body (optional)
+        :type data: dict
+
+        :param json_data: Request body (optional)
+        :type json_data: dict
+
+        :param func_name: Function name
+        :type func_name: str
+
+        :return: Response
+        :rtype: requests.Response
+        """
+
+        f_args = self.__get_func_args(locals())
+        headers = self.__make_headers(func_name, auth)
+
+        try:
+            response = requests.request(
+                method,
+                self.__base_url + url,
+                headers=headers,
+                params=params,
+                json=json_data,
+                data=data
+            )
+
+            return response
+        except Exception as e:
+            raise RequestsExceptions(
+                func_name,
+                e,
+                f_args=f_args
+            )
+
+    def markets_stats(self, symbol: t.Optional[str] = None) -> t.Dict:
+        """
+        Get markets stat.
+
+        :return: Markets stat
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        try:
+            response = self._request(
+                f_name,
+                'GET',
+                'markets'
+            )
+        except Exception as e:
+            raise RequestsExceptions(f_name, e)
+
+        resp = self._process_response(f_name, response)
+
+        if symbol is not None:
+            _ = resp.get('result').get('symbols').get(symbol.upper())
+            if _ is None:
+                raise InvalidInputs(
+                    f_name,
+                    f'Invalid symbol, Symbol Not Found',
+                    symbol=symbol,
+                )
+            return _
+
+        return resp
+
+    def orderbook(self, symbol: str) -> t.Dict[str, t.List[t.Dict[str, t.Any]]]:
+        """
+        Get orderbook.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :return: Orderbook
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        try:
+            response = self._request(
+                f_name,
+                'GET',
+                f'depth?symbol={symbol.upper()}'
+            )
+        except Exception as e:
+            raise RequestsExceptions(f_name, e)
+
+        return self._process_response(f_name, response)
+
+    def balances(self, asset: t.Optional[str] = None) -> t.Dict:
+        """
+        Get balances.
+
+        :param asset: Asset (optional)
+        :type asset: str
+
+        :return: Balances
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        try:
+            response = self._request(
+                f_name,
+                'GET',
+                'account/balances',
+                auth=True
+            )
+        except Exception as e:
+            raise RequestsExceptions(f_name, e)
+
+        resp = self._process_response(f_name, response)
+
+        if asset is not None:
+            return resp.get('result').get('balances').get(asset.upper())
+
+        return resp
+
+    def available_balance(self, asset: str) -> float:
+        """
+        Get available balances.
+
+        :return: Available balances
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        try:
+            balances = self.balances(asset)
+            return float(balances.get('value')) - float(balances.get('locked'))
+
+        except Exception as e:
+            raise WallexExceptions(f_name, e)
+
+    def create_order(
+            self,
+            symbol: str,
+            side: str,
+            quantity: t.Union[float, int],
+            price: t.Union[float, int],
+            order_type: str,
+            stop_price: t.Optional[t.Union[float, int]] = None,
+            client_order_id: t.Optional[str] = None
+    ) -> t.Dict:
+        """
+        Create order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param side: Side
+        :type side: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param price: Price
+        :type price: str
+
+        :param order_type: Order type
+        :type order_type: str
+
+        :param stop_price: Stop price (optional)
+        :type stop_price: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        data = {
+            "price": str(price),
+            "quantity": str(quantity),
+            "side": side.lower(),
+            "symbol": symbol.upper(),
+            "type": order_type.lower(),
+        }
+
+        if client_order_id is not None:
+            data.update({'client_id': client_order_id})
+
+        if order_type.lower() == self.STOP_LIMIT_ORDER or order_type.lower() == self.STOP_MARKET_ORDER:
+            if stop_price is None:
+                raise InvalidInputs(
+                    f_name,
+                    f'Stop price is required for {order_type} order',
+                    order_type=order_type,
+                    stop_price=stop_price
+                )
+            data.update({'stop_price': str(stop_price)})
+
+        try:
+            response = self._request(
+                f_name,
+                'POST',
+                'account/orders',
+                auth=True,
+                json_data=data
+            )
+        except Exception as e:
+            raise RequestsExceptions(f_name, e)
+
+        return self._process_response(f_name, response)
+
+    def cancel_order(self, order_id: str) -> t.Dict:
+        """
+        Cancel order.
+
+        :param order_id: Order ID
+        :type order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        data = {
+            "clientOrderId": order_id
+        }
+
+        try:
+            response = self._request(
+                f_name,
+                'DELETE',
+                f'account/orders',
+                auth=True,
+                json_data=data
+            )
+        except Exception as e:
+            raise RequestsExceptions(f_name, e)
+
+        return self._process_response(f_name, response)
+
+    def open_orders(self, symbol: t.Optional[str] = None, side: t.Optional[str] = None) -> t.Dict:
+        """
+        Get open orders.
+
+        :param symbol: Symbol (optional)
+        :type symbol: str
+
+        :param side: Side (optional)
+        :type side: str
+
+        :return: Open orders
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        params = {}
 
         url = f'account/openOrders'
         if symbol is not None:
             url += f'?symbol={symbol.upper()}'
 
         try:
-            r = self.session.get(self.base_url + url, timeout=self.timeout, verify=self.verify)
+            response = self._request(
+                f_name,
+                'GET',
+                url,
+                auth=True,
+                params=params
+            )
         except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+            raise RequestsExceptions(f_name, e)
 
-        status_code = r.status_code
+        resp = self._process_response(f_name, response)
 
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+        if side is not None:
+            all_orders = resp.get('result').get('orders')
+            for order in all_orders:
+                if order.get('side').lower() != side.lower():
+                    all_orders.remove(order)
 
-            if validate_response(resp):
-                return resp.get('result').get('orders')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
+        return resp
 
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
+    def user_recent_trades(self, symbol: t.Optional[str] = None,
+                           side: t.Optional[str] = None, active: t.Optional[bool] = None) -> t.Dict:
+        """
+        Get user recent trades.
 
-    def open_orders_by_side(self, symbol: str, side: str):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
+        :param symbol: Symbol (optional)
+        :type symbol: str
 
-        try:
-            r = self.session.get(self.base_url + f'account/openOrders?symbol={symbol.upper()}',
-                                 timeout=self.timeout, verify=self.verify)
-        except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+        :param side: Side (optional)
+        :type side: str
 
-        status_code = r.status_code
+        :param active: Active (optional)
+        :type active: bool
 
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+        :return: User recent trades
+        :rtype: dict
+        """
 
-            if validate_response(resp):
-                all_orders = resp.get('result').get('orders')
-                __ = []
-                for order in all_orders:
-                    order: dict
-                    if order.get('side').lower() == side.lower():
-                        __.append(order)
-                return __
-
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
-
-    def user_recent_trades(self, symbol: str = None, side: str = None, active: bool = None):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
+        f_name = cf().f_code.co_name
 
         params = {}
 
@@ -352,85 +503,97 @@ class Wallex:
             params.update({'active': active})
 
         try:
-            r = self.session.get(self.base_url + f'account/trades', params=params,
-                                 timeout=self.timeout, verify=self.verify)
+            response = self._request(
+                f_name,
+                'GET',
+                'account/trades',
+                auth=True,
+                params=params
+            )
         except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+            raise RequestsExceptions(f_name, e)
 
-        status_code = r.status_code
+        return self._process_response(f_name, response)
 
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+    def order_status(self, order_id: str) -> t.Dict:
+        """
+        Get order status.
 
-            if validate_response(resp):
-                return resp.get('result').get('AccountLatestTrades')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
+        :param order_id: Order ID
+        :type order_id: str
 
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
+        :return: Order status
+        :rtype: dict
+        """
 
-    def get_order_by_id(self, order_id: str):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
+        f_name = cf().f_code.co_name
 
         try:
-            r = self.session.get(self.base_url + f'account/orders/{order_id}',
-                                 timeout=self.timeout, verify=self.verify)
+            response = self._request(
+                f_name,
+                'GET',
+                f'account/orders/{order_id}',
+                auth=True,
+            )
         except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+            raise RequestsExceptions(f_name, e)
 
-        status_code = r.status_code
+        return self._process_response(f_name, response)
 
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+    def withdraw(self, coin: str, network: str, amount: t.Union[int, float],
+                 address: str, client_unique_id: str, memo: t.Optional[str] = None):
+        """
+        Withdraw.
 
-            if validate_response(resp):
-                return resp.get('result')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
+        :param coin: Coin
+        :type coin: str
 
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
+        :param client_unique_id: Client unique ID
+        :type client_unique_id: str
 
-    def withdraw(self, coin: str, client_unique_id: str, network: str, amount: str, address: str, memo: str = None):
-        _ = locals()
-        func_name = inspect.currentframe().f_code.co_name
+        :param network: Network
+        :type network: str
+
+        :param amount: Amount
+        :type amount: str
+
+        :param address: Address
+        :type address: str
+
+        :param memo: Memo (optional)
+        :type memo: str
+
+        :return: Withdraw
+        :rtype: dict
+        """
+
+        f_name = cf().f_code.co_name
+
+        data = {
+            "coin": coin.upper(),
+            "client_unique_id": str(client_unique_id),
+            "network": network,
+            "value": str(amount),
+            "wallet_address": address,
+        }
+        if memo:
+            data.update({'memo': memo})
 
         try:
-            payload = {
-                "coin": coin.upper(),
-                "client_unique_id": str(client_unique_id),
-                "network": network,
-                "value": str(amount),
-                "wallet_address": address,
-            }
-            if memo:
-                payload.update({'memo': memo})
-            payload = json.dumps(payload)
-            r = self.session.post(self.base_url + f'account/crypto-withdrawal', data=payload,
-                                  timeout=self.timeout, verify=self.verify)
+            response = self._request(
+                f_name,
+                'POST',
+                'account/crypto-withdrawal',
+                auth=True,
+                json_data=data
+            )
         except Exception as e:
-            raise RequestsExceptions(func_name, e, _)
+            raise RequestsExceptions(f_name, e)
 
-        status_code = r.status_code
+        return self._process_response(f_name, response)
 
-        if 200 <= status_code < 300:
-            try:
-                resp = r.json()
-            except JSONDecodeError as e:
-                raise JsonDecodingError(func_name, r.text, _)
+    def __str__(self):
+        return f'Wallex API Client, By {__author__}, Version {__version__}'
 
-            if validate_response(resp):
-                return resp.get('result')
-            else:
-                raise JsonDecodingError(func_name, r.text, _)
-
-        else:
-            raise StatusCodeError(func_name, status_code, r.text, _)
+    def __repr__(self):
+        return f'Wallex API Client, By {__author__}, Version {__version__}'

@@ -1,57 +1,90 @@
-from typing import Union
+import typing as t
+from requests import Response
+
+
+__all__ = [
+    'WallexExceptions',
+    'RequestsExceptions',
+    'RequestTimeout',
+    'TokenException',
+    'InvalidResponse',
+    'StatusCodeError',
+    'JSONDecodingError',
+    'InvalidInputs'
+]
 
 
 class WallexExceptions(Exception):
-    def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
+    def __init__(
+            self, func_name: str, message: t.Union[str, t.Type[Exception], Exception], *args, **kwargs
+    ):
+        """
+        Base exception class for Bitpin.
+
+        :param func_name: function name that raise exception
+        :type func_name: str
+
+        :param message: message of exception
+        :type message: str | Exception
+
+        :param args: args of exception
+        :type args: t.Any
+
+        :param kwargs: kwargs of exception
+        :type kwargs: t.Any
+
+        :return: None
+        :rtype: None
+        """
+
         self.func_name = func_name
         self.message = str(message)
-        self._args = args
+        self.f_args = args
+        self.f_kwargs = kwargs
         super().__init__(self.message)
 
     def __str__(self):
-        return f'"{self.func_name}" -> {self.message} | {str(self._args)}'
+        __str = f'[{self.func_name}] -> {self.message}'
+
+        if self.f_args and len(self.f_args) > 0:
+            __str += f' | Args: {self.f_args}'
+        if self.f_kwargs:
+            __str += f' | Kwargs: {self.f_kwargs}'
+
+        return __str
 
 
 class RequestsExceptions(WallexExceptions):
-    def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
-        self.func_name = func_name
-        self.message = message
-        self._args = args
-        super().__init__(func_name, message, args)
-
-    def __str__(self):
-        return f'{self.func_name} -> {self.message} | {str(self._args)}'
+    """ Exception class for requests error. """
 
 
-class StatusCodeError(WallexExceptions):
-    def __init__(self, func_name: str, status_code: int, message: Union[str, Exception], args: dict):
-        self.func_name = func_name
-        self.status_code = status_code
-        self.message = message
-        self._args = args
-        super().__init__(func_name, message, args)
-
-    def __str__(self):
-        return f'{self.func_name} | {self.status_code} -> {self.message} | {str(self._args)}'
+class RequestTimeout(RequestsExceptions):
+    """ Exception class for requests timeout error. """
 
 
-class JsonDecodingError(WallexExceptions):
-    def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
-        self.func_name = func_name
-        self.message = message
-        self._args = args
-        super().__init__(func_name, message, args)
-
-    def __str__(self):
-        return f'{self.func_name} -> {self.message} | {str(self._args)}'
+class TokenException(RequestsExceptions):
+    """ Exception class for invalid token error. """
 
 
-class InvalidResponse(WallexExceptions):
-    def __init__(self, func_name: str, message: Union[str, Exception], args: dict):
-        self.func_name = func_name
-        self.message = message
-        self._args = args
-        super().__init__(func_name, message, args)
+class ProcessExceptions(WallexExceptions):
+    """ Exception class for process error. """
 
-    def __str__(self):
-        return f'{self.func_name} -> {self.message} | {str(self._args)}'
+    def __init__(self, func_name: str, message: str, response: Response, *args, **kwargs):
+        self.response = response
+        super().__init__(func_name, message, *args, **kwargs)
+
+
+class StatusCodeError(ProcessExceptions):
+    """ Exception class for status code error. """
+
+
+class JSONDecodingError(ProcessExceptions):
+    """ Exception class for json decode error. """
+
+
+class InvalidResponse(ProcessExceptions):
+    """ Exception class for invalid response error. """
+
+
+class InvalidInputs(WallexExceptions):
+    """ Exception class for invalid requested data error. """

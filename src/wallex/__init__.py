@@ -1,7 +1,12 @@
-from .main import Wallex, get_token
+from .main import Wallex
 from . import exceptions
 
+from ._deprecated import Wallex as WallexDeprecated
 
-__version__ = "0.1.2"
-__author__ = "amiwrpremium"
-__reason__ = 'OK'
+from ._package_data import __version__
+
+
+__all__ = [
+    'Wallex',
+    'exceptions',
+]
