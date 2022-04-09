@@ -11,7 +11,7 @@ from ._package_data import __version__, __author__
 
 if socketio.__version__ < '4.0.0' or socketio.__version__ >= '5.0.0':
     raise RuntimeError('socketio version should be > 4.0.0 and <= 5.0.0')
-if engineio.__version__ < '2.0.0' or engineio.__version__ >= '3.0.0':
+if engineio.__version__ < '3.0.0' or engineio.__version__ >= '4.0.0':
     raise RuntimeError('engineio version should be > 2.0.0 and <= 3.0.0')
 
 
