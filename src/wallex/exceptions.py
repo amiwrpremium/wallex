@@ -71,7 +71,8 @@ class ProcessExceptions(WallexExceptions):
 
     def __init__(self, func_name: str, message: str, response: Response, *args, **kwargs):
         self.response = response
-        super().__init__(func_name, message, *args, **kwargs)
+        msg = f'{message} || {response.text}'
+        super().__init__(func_name, msg, *args, **kwargs)
 
 
 class StatusCodeError(ProcessExceptions):

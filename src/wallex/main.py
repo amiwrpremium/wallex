@@ -97,31 +97,18 @@ class Wallex:
         return headers
 
     @staticmethod
-    def __validate_response(f_name: str, response: t.Dict) -> bool:
-        _ = response.get('success') is True or str(response.get('success')).lower() == 'true'
+    def __validate_response(f_name: str, response: requests.Response) -> bool:
+        r_json = response.json()
+        _ = r_json.get('success') is True or str(r_json.get('success')).lower() == 'true'
 
         if _ is False:
             raise InvalidResponse(
                 f_name,
                 'invalid response',
-                response_json=response
+                response=response
             )
 
         return _
-
-    def set_token(self, token: str) -> str:
-        """
-        Set token
-
-        :param token: Token
-        :type token: str
-
-        :return: Token
-        :rtype: str
-        """
-
-        self.__token = token
-        return self.__token
 
     def _process_response(
             self,
@@ -165,7 +152,7 @@ class Wallex:
                 additional=additional
             )
 
-        self.__validate_response(func_name, r_json)
+        self.__validate_response(func_name, response)
 
         return r_json
 
@@ -221,6 +208,20 @@ class Wallex:
                 e,
                 f_args=f_args
             )
+
+    def set_token(self, token: str) -> str:
+        """
+        Set token
+
+        :param token: Token
+        :type token: str
+
+        :return: Token
+        :rtype: str
+        """
+
+        self.__token = token
+        return self.__token
 
     def markets_stats(self, symbol: t.Optional[str] = None) -> t.Dict:
         """
