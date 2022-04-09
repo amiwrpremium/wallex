@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='wallex',
     packages=['wallex'],
-    version='0.2.6',
+    version='0.2.7',
     license='MIT',
     description='Wallex cryptocurrency exchange python sdk',
     author='amiwrpremium',
@@ -14,6 +14,8 @@ setup(
         'requests',
         'simplejson',
         'deprecation',
+        'python-socketio==4.6.1',
+        'python-engineio==3.14.2',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

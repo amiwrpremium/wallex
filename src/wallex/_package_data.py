@@ -1,5 +1,5 @@
 __name__ = "wallex"
-__version__ = "0.2.6"
+__version__ = "0.2.7"
 __author__ = "amiwrpremium"
 __reason__ = 'OK'
 __email__ = "amiwrpremium@gmail.com"
