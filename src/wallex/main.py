@@ -154,7 +154,7 @@ class Wallex:
 
         self.__validate_response(func_name, response)
 
-        return r_json
+        return r_json.get('result')
 
     def _request(
             self, func_name: str, method: str, url: str, auth: t.Optional[bool] = False,
@@ -245,7 +245,7 @@ class Wallex:
         resp = self._process_response(f_name, response)
 
         if symbol is not None:
-            _ = resp.get('result').get('symbols').get(symbol.upper())
+            _ = resp.get('symbols').get(symbol.upper())
             if _ is None:
                 raise InvalidInputs(
                     f_name,
@@ -306,7 +306,7 @@ class Wallex:
         resp = self._process_response(f_name, response)
 
         if asset is not None:
-            return resp.get('result').get('balances').get(asset.upper())
+            return resp.get('balances').get(asset.upper())
 
         return resp
 
@@ -467,7 +467,7 @@ class Wallex:
         resp = self._process_response(f_name, response)
 
         if side is not None:
-            all_orders = resp.get('result').get('orders')
+            all_orders = resp.get('orders')
             for order in all_orders:
                 if order.get('side').lower() != side.lower():
                     all_orders.remove(order)
