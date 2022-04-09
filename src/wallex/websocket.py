@@ -98,7 +98,11 @@ class WallexWebsocket:
         """
 
         _url = url or self._url
-        self._sio.connect(_url, **params or {})
+        _params = params or {}
+        if 'transports' not in _params.keys():
+            _params['transports'] = ['websocket']
+
+        self._sio.connect(_url, **_params)
         self._is_connected = True
         self.__debug_print('Connection established')
 
