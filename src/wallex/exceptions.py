@@ -10,7 +10,9 @@ __all__ = [
     'InvalidResponse',
     'StatusCodeError',
     'JSONDecodingError',
-    'InvalidInputs'
+    'InvalidInputs',
+    'WebsocketExceptions',
+    'WebsocketNotConnected'
 ]
 
 
@@ -89,3 +91,11 @@ class InvalidResponse(ProcessExceptions):
 
 class InvalidInputs(WallexExceptions):
     """ Exception class for invalid requested data error. """
+
+
+class WebsocketExceptions(WallexExceptions):
+    """ Exception class for websocket error. """
+
+
+class WebsocketNotConnected(WebsocketExceptions):
+    """ Exception class for websocket not connected error. """

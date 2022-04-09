@@ -1,4 +1,5 @@
 venv
+venv/
 test
 __pycache__
 src/wallex/__pycache__

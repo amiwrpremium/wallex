@@ -594,7 +594,7 @@ class Wallex:
         return self._process_response(f_name, response)
 
     def __str__(self):
-        return f'Wallex API Client, By {__author__}, Version {__version__}'
+        return f'Wallex REST API Client, By {__author__}, Version {__version__}'
 
     def __repr__(self):
-        return f'Wallex API Client, By {__author__}, Version {__version__}'
+        return f'Wallex REST API Client, By {__author__}, Version {__version__}'
