@@ -115,6 +115,7 @@ class Wallex:
             func_name: str,
             response: requests.Response,
             additional: t.Optional[t.Dict] = None,
+            load_result: bool = True
     ) -> t.Dict:
         """
         Check response for exceptions.
@@ -153,6 +154,9 @@ class Wallex:
             )
 
         self.__validate_response(func_name, response)
+
+        if load_result is False:
+            return r_json
 
         return r_json.get('result')
 
@@ -431,7 +435,9 @@ class Wallex:
 
         return self._process_response(f_name, response)
 
-    def open_orders(self, symbol: t.Optional[str] = None, side: t.Optional[str] = None) -> t.Dict:
+    def open_orders(
+            self, symbol: t.Optional[str] = None, side: t.Optional[str] = None, page: int = 1, per_page: int = 200
+    ) -> t.Dict:
         """
         Get open orders.
 
@@ -441,17 +447,27 @@ class Wallex:
         :param side: Side (optional)
         :type side: str
 
+        :param page: Page (optional)
+        :type page: int
+
+        :param per_page: Per page (optional)
+        :type per_page: int
+
         :return: Open orders
         :rtype: dict
         """
 
         f_name = cf().f_code.co_name
 
-        params = {}
-
         url = f'account/openOrders'
+
+        params = {
+            'page': page,
+            'per_page': per_page
+        }
+
         if symbol is not None:
-            url += f'?symbol={symbol.upper()}'
+            params.update({'symbol': symbol.upper()})
 
         try:
             response = self._request(
@@ -464,7 +480,7 @@ class Wallex:
         except Exception as e:
             raise RequestsExceptions(f_name, e)
 
-        resp = self._process_response(f_name, response)
+        resp = self._process_response(f_name, response, load_result=False)
 
         if side is not None:
             all_orders = resp.get('orders')
@@ -474,8 +490,10 @@ class Wallex:
 
         return resp
 
-    def user_recent_trades(self, symbol: t.Optional[str] = None,
-                           side: t.Optional[str] = None, active: t.Optional[bool] = None) -> t.Dict:
+    def user_recent_trades(
+            self, symbol: t.Optional[str] = None, side: t.Optional[str] = None, active: t.Optional[bool] = None,
+            page: int = 1, per_page: int = 200
+    ) -> t.Dict:
         """
         Get user recent trades.
 
@@ -488,13 +506,22 @@ class Wallex:
         :param active: Active (optional)
         :type active: bool
 
+        :param page: Page (optional)
+        :type page: int
+
+        :param per_page: Per page (optional)
+        :type per_page: int
+
         :return: User recent trades
         :rtype: dict
         """
 
         f_name = cf().f_code.co_name
 
-        params = {}
+        params = {
+            'page': page,
+            'per_page': per_page
+        }
 
         if symbol:
             params.update({'symbol': symbol.upper()})
@@ -514,7 +541,7 @@ class Wallex:
         except Exception as e:
             raise RequestsExceptions(f_name, e)
 
-        return self._process_response(f_name, response)
+        return self._process_response(f_name, response, load_result=False)
 
     def order_status(self, order_id: str) -> t.Dict:
         """
