@@ -483,7 +483,7 @@ class Wallex:
         resp = self._process_response(f_name, response, load_result=False)
 
         if side is not None:
-            all_orders = resp.get('orders')
+            all_orders = resp.get('result').get('orders')
             for order in all_orders:
                 if order.get('side').lower() != side.lower():
                     all_orders.remove(order)
