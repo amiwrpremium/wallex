@@ -32,7 +32,7 @@ class Wallex:
         }
 
         if self.__token:
-            self.__headers['Authorization'] = 'Bearer ' + self.__token
+            self.__headers['x-api-key'] = self.__token
 
         if self.__requests_params:
             if 'headers' in self.__requests_params.keys():
@@ -404,6 +404,187 @@ class Wallex:
             raise RequestsExceptions(f_name, e)
 
         return self._process_response(f_name, response)
+
+    def order_market(self, symbol: str, side: str, quantity: float, client_order_id: t.Optional[str] = None) -> t.Dict:
+        """
+        Create market order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param side: Side
+        :type side: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        return self.create_order(
+            symbol=symbol,
+            side=side,
+            quantity=quantity,
+            price=0,
+            order_type=self.MARKET_ORDER,
+            client_order_id=client_order_id
+        )
+
+    def order_market_buy(self, symbol: str, quantity: float, client_order_id: t.Optional[str] = None) -> t.Dict:
+        """
+        Create market buy order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        return self.order_market(
+            symbol=symbol,
+            side=self.BUY_ORDER,
+            quantity=quantity,
+            client_order_id=client_order_id
+        )
+
+    def order_market_sell(self, symbol: str, quantity: float, client_order_id: t.Optional[str] = None) -> t.Dict:
+        """
+        Create market sell order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        return self.order_market(
+            symbol=symbol,
+            side=self.SELL_ORDER,
+            quantity=quantity,
+            client_order_id=client_order_id
+        )
+
+    def order_limit(
+            self, symbol: str, side: str, quantity: float, price: float,
+            stop_price: t.Optional[t.Union[float, int]] = None, client_order_id: t.Optional[str] = None
+    ) -> t.Dict:
+        """
+        Create limit order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param side: Side
+        :type side: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param price: Price
+        :type price: str
+
+        :param stop_price: Stop price (optional)
+        :type stop_price: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        return self.create_order(
+            symbol=symbol,
+            side=side,
+            quantity=quantity,
+            price=price,
+            order_type=self.LIMIT_ORDER,
+            stop_price=stop_price,
+            client_order_id=client_order_id
+        )
+
+    def order_limit_buy(
+            self, symbol: str, quantity: float, price: float,
+            stop_price: t.Optional[t.Union[float, int]] = None, client_order_id: t.Optional[str] = None
+    ) -> t.Dict:
+        """
+        Create limit buy order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param price: Price
+        :type price: str
+
+        :param stop_price: Stop price (optional)
+        :type stop_price: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        return self.order_limit(
+            symbol=symbol,
+            side=self.BUY_ORDER,
+            quantity=quantity,
+            price=price,
+            stop_price=stop_price,
+            client_order_id=client_order_id
+        )
+
+    def order_limit_sell(
+            self, symbol: str, quantity: float, price: float, client_order_id: t.Optional[str] = None
+    ) -> t.Dict:
+        """
+        Create limit sell order.
+
+        :param symbol: Symbol
+        :type symbol: str
+
+        :param quantity: Amount
+        :type quantity: str
+
+        :param price: Price
+        :type price: str
+
+        :param client_order_id: Client order ID (optional)
+        :type client_order_id: str
+
+        :return: Order
+        :rtype: dict
+        """
+
+        return self.order_limit(
+            symbol=symbol,
+            side=self.SELL_ORDER,
+            quantity=quantity,
+            price=price,
+            client_order_id=client_order_id
+        )
 
     def cancel_order(self, order_id: str) -> t.Dict:
         """
