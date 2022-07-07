@@ -1,9 +1,11 @@
 from distutils.core import setup
+from setuptools import find_packages
 
 setup(
     name='wallex',
-    packages=['wallex'],
-    version='0.3.3',
+    package_dir={'': 'src'},
+    packages=find_packages(where='src'),
+    version='0.4.0',
     license='MIT',
     description='Wallex cryptocurrency exchange python sdk',
     author='amiwrpremium',
@@ -16,7 +18,9 @@ setup(
         'deprecation',
         'python-socketio==4.6.1',
         'python-engineio==3.14.2',
-        'websocket-client==1.3.2'
+        'websocket-client==1.3.2',
+        'aiohttp[speedups]',
+        'pydantic'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

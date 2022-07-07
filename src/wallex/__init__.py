@@ -1,15 +1,11 @@
-from .main import Wallex
-from .websocket import WallexWebsocket
+from . import wallex_deprecated
 
-from . import exceptions
-
-from ._deprecated import Wallex as WallexDeprecated
+from .clients import Client, AsyncClient
 
 from ._package_data import __version__
 
 
 __all__ = [
-    'Wallex',
-    'WallexWebsocket',
-    'exceptions',
+    'Client',
+    'AsyncClient',
 ]
