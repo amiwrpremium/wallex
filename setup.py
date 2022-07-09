@@ -5,7 +5,7 @@ setup(
     name='wallex',
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
-    version='0.4.3',
+    version='0.4.4',
     license='MIT',
     description='Wallex cryptocurrency exchange python sdk',
     author='amiwrpremium',

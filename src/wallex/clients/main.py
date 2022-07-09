@@ -68,7 +68,7 @@ class Client(BaseClient, AbstractClient):
 
         if symbol is not None:
             data = self._pick(result.get('result').get('symbols'), symbol)
-            result['result'] = data
+            result['result']['symbols'] = data
 
         return result
 
@@ -165,7 +165,7 @@ class Client(BaseClient, AbstractClient):
 
     def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
         return self.create_order(
-            symbol=symbol, side=side, type=self.ORDER_TYPE_LIMIT, quantity=quantity, client_id=client_id
+            symbol=symbol, side=side, type=self.ORDER_TYPE_LIMIT, quantity=quantity, client_id=client_id, price=price
         )
 
     def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
@@ -196,11 +196,11 @@ class Client(BaseClient, AbstractClient):
 
         if symbol is not None:
             data = self._pick(result.get('result').get('orders'), "symbol", symbol)
-            result['result'] = data
+            result['result']['orders'] = data
 
         if side is not None:
             data = self._pick(result.get('result').get('orders'), "side", side)
-            result['result'] = data
+            result['result']['orders'] = data
 
         return result
 
@@ -302,7 +302,7 @@ class AsyncClient(BaseClient, AbstractClient):
 
         if symbol is not None:
             data = self._pick(result.get('result').get('symbols'), symbol)
-            result['result'] = data
+            result['result']['symbols'] = data
 
         return result
 
@@ -392,7 +392,7 @@ class AsyncClient(BaseClient, AbstractClient):
     async def create_order(
             self, symbol: str, side: str, type: str, quantity: float, price: float = None, client_id: str = None
     ) -> t.Dict:
-        return await self._post('account/orders', signed=True, json=self._get_kwargs(locals()))
+        return await self._post('account/orders', signed=True, json=self._get_kwargs(locals(), del_nones=True))
 
     async def order_market(self, symbol: str, side: str, quantity: float, client_id: str = None) -> t.Dict:
         return await self.create_order(
@@ -401,7 +401,7 @@ class AsyncClient(BaseClient, AbstractClient):
 
     async def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
         return await self.create_order(
-            symbol=symbol, side=side, type=self.ORDER_TYPE_LIMIT, quantity=quantity, client_id=client_id
+            symbol=symbol, side=side, type=self.ORDER_TYPE_LIMIT, quantity=quantity, client_id=client_id, price=price
         )
 
     async def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
@@ -432,11 +432,11 @@ class AsyncClient(BaseClient, AbstractClient):
 
         if symbol is not None:
             data = self._pick(result.get('result').get('orders'), "symbol", symbol)
-            result['result'] = data
+            result['result']['orders'] = data
 
         if side is not None:
             data = self._pick(result.get('result').get('orders'), "side", side)
-            result['result'] = data
+            result['result']['orders'] = data
 
         return result
 
