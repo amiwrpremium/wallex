@@ -8,3 +8,4 @@ src/__pycache__
 *.db
 .idea
 .DS_Store
+.env

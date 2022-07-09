@@ -135,9 +135,14 @@ class Client(BaseClient, AbstractClient):
 
         if asset is not None:
             data = self._pick(result.get('result').get('balances'), asset)
-            result['result'] = data
+            result['result']['balances'] = data
 
         return result
+
+    def get_available_balance(self, asset: str) -> float:
+        result = self.get_balances(asset)
+        result = result.get('result').get('balances').get(asset.upper())
+        return float(result.get('value')) - float(result.get('locked'))
 
     def get_fees(self, symbol: str = None) -> t.Dict:
         result = self._get('account/fee', signed=True)
@@ -352,9 +357,16 @@ class AsyncClient(BaseClient, AbstractClient):
 
         if asset is not None:
             data = self._pick(result.get('result').get('balances'), asset)
-            result['result'] = data
+            result['result']['balances'] = data
 
         return result
+
+    async def get_available_balance(self, asset: str) -> float:
+        result = await self.get_balances(asset)
+
+        result = result.get('result').get('balances').get(asset.upper())
+
+        return float(result.get('value')) - float(result.get('locked'))
 
     async def get_fees(self, symbol: str = None) -> t.Dict:
         result = await self._get('account/fee', signed=True)

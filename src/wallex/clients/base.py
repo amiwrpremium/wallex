@@ -212,6 +212,10 @@ class AbstractClient(ABC):
         raise NotImplementedError('get_balances not implemented')
 
     @abstractmethod
+    def get_available_balance(self, asset: str) -> float:
+        raise NotImplementedError('get_available_balance not implemented')
+
+    @abstractmethod
     def get_fees(self, symbol: str = None) -> t.Dict:
         raise NotImplementedError('get_fees not implemented')
 
