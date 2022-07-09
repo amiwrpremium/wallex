@@ -162,7 +162,7 @@ class Client(BaseClient, AbstractClient):
         return self.create_order(symbol, side, self.ORDER_TYPE_MARKET, quantity, client_id)
 
     def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return self.create_order(symbol, side, self.ORDER_TYPE_LIMIT_MAKER, quantity, client_id)
+        return self.create_order(symbol, side, self.ORDER_TYPE_LIMIT, quantity, client_id)
 
     def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
         return self.order_market(symbol, self.SIDE_BUY, quantity, client_id)
@@ -386,7 +386,7 @@ class AsyncClient(BaseClient, AbstractClient):
         return await self.create_order(symbol, side, self.ORDER_TYPE_MARKET, quantity, client_id)
 
     async def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return await self.create_order(symbol, side, self.ORDER_TYPE_LIMIT_MAKER, quantity, client_id)
+        return await self.create_order(symbol, side, self.ORDER_TYPE_LIMIT, quantity, client_id)
 
     async def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
         return await self.order_market(symbol, self.SIDE_BUY, quantity, client_id)
