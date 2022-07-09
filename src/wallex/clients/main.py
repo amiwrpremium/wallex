@@ -159,22 +159,34 @@ class Client(BaseClient, AbstractClient):
         return self._post('account/orders', signed=True, json=self._get_kwargs(locals(), del_nones=True))
 
     def order_market(self, symbol: str, side: str, quantity: float, client_id: str = None) -> t.Dict:
-        return self.create_order(symbol, side, self.ORDER_TYPE_MARKET, quantity, client_id)
+        return self.create_order(
+            symbol=symbol, side=side, type=self.ORDER_TYPE_MARKET, quantity=quantity, client_id=client_id
+        )
 
     def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return self.create_order(symbol, side, self.ORDER_TYPE_LIMIT, quantity, client_id)
+        return self.create_order(
+            symbol=symbol, side=side, type=self.ORDER_TYPE_LIMIT, quantity=quantity, client_id=client_id
+        )
 
     def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
-        return self.order_market(symbol, self.SIDE_BUY, quantity, client_id)
+        return self.order_market(
+            symbol=symbol, side=self.SIDE_BUY, quantity=quantity, client_id=client_id
+        )
 
     def order_market_sell(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
-        return self.order_market(symbol, self.SIDE_SELL, quantity, client_id)
+        return self.order_market(
+            symbol=symbol, side=self.SIDE_SELL, quantity=quantity, client_id=client_id
+        )
 
     def order_limit_buy(self, symbol: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return self.order_limit(symbol, self.SIDE_BUY, quantity, price, client_id)
+        return self.order_limit(
+            symbol=symbol, side=self.SIDE_BUY, quantity=quantity, price=price, client_id=client_id
+        )
 
     def order_limit_sell(self, symbol: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return self.order_limit(symbol, self.SIDE_SELL, quantity, price, client_id)
+        return self.order_limit(
+            symbol=symbol, side=self.SIDE_SELL, quantity=quantity, price=price, client_id=client_id
+        )
 
     def cancel_order(self, order_id: str) -> t.Dict:
         return self._delete(f'account/orders', signed=True, json={'clientOrderId': order_id})
@@ -383,22 +395,34 @@ class AsyncClient(BaseClient, AbstractClient):
         return await self._post('account/orders', signed=True, json=self._get_kwargs(locals()))
 
     async def order_market(self, symbol: str, side: str, quantity: float, client_id: str = None) -> t.Dict:
-        return await self.create_order(symbol, side, self.ORDER_TYPE_MARKET, quantity, client_id)
+        return await self.create_order(
+            symbol=symbol, side=side, type=self.ORDER_TYPE_MARKET, quantity=quantity, client_id=client_id
+        )
 
     async def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return await self.create_order(symbol, side, self.ORDER_TYPE_LIMIT, quantity, client_id)
+        return await self.create_order(
+            symbol=symbol, side=side, type=self.ORDER_TYPE_LIMIT, quantity=quantity, client_id=client_id
+        )
 
     async def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
-        return await self.order_market(symbol, self.SIDE_BUY, quantity, client_id)
+        return await self.order_market(
+            symbol=symbol, side=self.SIDE_BUY, quantity=quantity, client_id=client_id
+        )
 
     async def order_market_sell(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
-        return await self.order_market(symbol, self.SIDE_SELL, quantity, client_id)
+        return await self.order_market(
+            symbol=symbol, side=self.SIDE_SELL, quantity=quantity, client_id=client_id
+        )
 
     async def order_limit_buy(self, symbol: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return await self.order_limit(symbol, self.SIDE_BUY, quantity, price, client_id)
+        return await self.order_limit(
+            symbol=symbol, side=self.SIDE_BUY, quantity=quantity, price=price, client_id=client_id
+        )
 
     async def order_limit_sell(self, symbol: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        return await self.order_limit(symbol, self.SIDE_SELL, quantity, price, client_id)
+        return await self.order_limit(
+            symbol=symbol, side=self.SIDE_SELL, quantity=quantity, price=price, client_id=client_id
+        )
 
     async def cancel_order(self, order_id: str) -> t.Dict:
         return await self._delete(f'account/orders', signed=True, json={'clientOrderId': order_id})
