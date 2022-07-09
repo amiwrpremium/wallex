@@ -383,14 +383,10 @@ class AsyncClient(BaseClient, AbstractClient):
         return await self._post('account/orders', signed=True, json=self._get_kwargs(locals()))
 
     async def order_market(self, symbol: str, side: str, quantity: float, client_id: str = None) -> t.Dict:
-        params = self._get_kwargs(locals())
-        params.update({'type': self.ORDER_TYPE_MARKET})
-        return await self._post('account/orders', signed=True, json=params)
+        return await self.create_order(symbol, side, self.ORDER_TYPE_MARKET, quantity, client_id)
 
     async def order_limit(self, symbol: str, side: str, quantity: float, price: float, client_id: str = None) -> t.Dict:
-        params = self._get_kwargs(locals())
-        params.update({'type': self.ORDER_TYPE_LIMIT})
-        return await self._post('account/orders', signed=True, json=params)
+        return await self.create_order(symbol, side, self.ORDER_TYPE_LIMIT_MAKER, quantity, client_id)
 
     async def order_market_buy(self, symbol: str, quantity: float, client_id: str = None) -> t.Dict:
         return await self.order_market(symbol, self.SIDE_BUY, quantity, client_id)
