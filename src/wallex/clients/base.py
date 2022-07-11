@@ -9,11 +9,11 @@ from ..enums import Resolution
 
 __all__ = [
     'BaseClient',
-    'AbstractClient'
+    # 'AbstractClient'
 ]
 
 
-class BaseClient:
+class BaseClient(ABC):
     API_URL = 'https://api.wallex.ir'
     PUBLIC_API_VERSION = 'v1'
 
@@ -56,9 +56,6 @@ class BaseClient:
             'Accept': 'application/json',
         }
         return headers
-
-    def _init_session(self):
-        raise NotImplementedError
 
     def _create_api_uri(self, path: str, version: str = PUBLIC_API_VERSION) -> str:
         return self.API_URL + '/' + version + '/' + path
@@ -109,11 +106,6 @@ class BaseClient:
 
             return result_
 
-
-class AbstractClient(ABC):
-    def __init__(self):
-        pass
-
     @abstractmethod
     def _init_session(self) -> requests.Session:
         raise NotImplementedError('_init_session not implemented')
@@ -129,24 +121,24 @@ class AbstractClient(ABC):
 
     @abstractmethod
     def _request_api(
-            self, method, path: str, signed: bool = False, version=BaseClient.PUBLIC_API_VERSION, **kwargs
+            self, method, path: str, signed: bool = False, version=PUBLIC_API_VERSION, **kwargs
     ):
         raise NotImplementedError('_request_api not implemented')
 
     @abstractmethod
-    def _get(self, path, signed=False, version=BaseClient.PUBLIC_API_VERSION, **kwargs) -> t.Dict:
+    def _get(self, path, signed=False, version=PUBLIC_API_VERSION, **kwargs) -> t.Dict:
         raise NotImplementedError('_get not implemented')
 
     @abstractmethod
-    def _post(self, path, signed=False, version=BaseClient.PUBLIC_API_VERSION, **kwargs) -> t.Dict:
+    def _post(self, path, signed=False, version=PUBLIC_API_VERSION, **kwargs) -> t.Dict:
         raise NotImplementedError('_post not implemented')
 
     @abstractmethod
-    def _put(self, path, signed=False, version=BaseClient.PUBLIC_API_VERSION, **kwargs) -> t.Dict:
+    def _put(self, path, signed=False, version=PUBLIC_API_VERSION, **kwargs) -> t.Dict:
         raise NotImplementedError('_put not implemented')
 
     @abstractmethod
-    def _delete(self, path, signed=False, version=BaseClient.PUBLIC_API_VERSION, **kwargs) -> t.Dict:
+    def _delete(self, path, signed=False, version=PUBLIC_API_VERSION, **kwargs) -> t.Dict:
         raise NotImplementedError('_delete not implemented')
 
     @abstractmethod

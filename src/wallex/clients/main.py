@@ -4,7 +4,7 @@ import aiohttp
 import asyncio
 
 from ..enums import Resolution
-from .base import BaseClient, AbstractClient
+from .base import BaseClient
 from ..exceptions import RequestException, APIException
 
 
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class Client(BaseClient, AbstractClient):
+class Client(BaseClient):
     def __init__(
             self, api_key: t.Optional[str] = None, requests_params: t.Optional[t.Dict[str, t.Any]] = None,
     ):
@@ -228,7 +228,7 @@ class Client(BaseClient, AbstractClient):
         self.close_connection()
 
 
-class AsyncClient(BaseClient, AbstractClient):
+class AsyncClient(BaseClient):
     def __init__(
             self,
             api_key: t.Optional[str] = None,
