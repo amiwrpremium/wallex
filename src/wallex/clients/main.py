@@ -93,8 +93,8 @@ class Client(BaseClient):
     def get_orderbook(self, symbol: str) -> t.Dict:
         return self._get('depth', params={'symbol': symbol})
 
-    def get_recent_trades(self, symbol: str = 'None', **kwargs) -> t.Dict:
-        return self._get('trades', params={'symbol': symbol}, **kwargs)
+    def get_recent_trades(self, symbol: str = 'None', page: int = 1) -> t.Dict:
+        return self._get('trades', params={'symbol': symbol, 'page': page})
 
     def get_ohlc_data(
             self, symbol: str = None, resolution: Resolution = None, from_date: int = None, to_date: int = None
@@ -191,8 +191,8 @@ class Client(BaseClient):
     def cancel_order(self, order_id: str) -> t.Dict:
         return self._delete(f'account/orders', signed=True, json={'clientOrderId': order_id})
 
-    def get_open_orders(self, symbol: str = None, side: str = None) -> t.Dict:
-        result = self._get('account/openOrders', signed=True)
+    def get_open_orders(self, symbol: str = None, side: str = None, page: int = 1) -> t.Dict:
+        result = self._get('account/openOrders', signed=True, params={'page': page})
 
         if symbol is not None:
             data = self._pick(result.get('result').get('orders'), "symbol", symbol)
@@ -204,11 +204,14 @@ class Client(BaseClient):
 
         return result
 
-    def get_user_recent_trades(self, symbol: str = None, side: str = None, active: bool = None) -> t.Dict:
+    def get_user_recent_trades(
+            self, symbol: str = None, side: str = None, active: bool = None, page: int = 1
+    ) -> t.Dict:
         return self._get('account/trades', signed=True, params={
             'symbol': symbol,
             'side': side,
-            'active': active
+            'active': active,
+            'page': page
         })
 
     def get_order_status(self, order_id: str) -> t.Dict:
@@ -327,8 +330,8 @@ class AsyncClient(BaseClient):
     async def get_orderbook(self, symbol: str) -> t.Dict:
         return await self._get('depth', params={'symbol': symbol})
 
-    async def get_recent_trades(self, symbol: str = 'None', **kwargs) -> t.Dict:
-        return await self._get('trades', params={'symbol': symbol}, **kwargs)
+    async def get_recent_trades(self, symbol: str = 'None', page: int = 1) -> t.Dict:
+        return await self._get('trades', params={'symbol': symbol, 'page': page})
 
     async def get_ohlc_data(
             self, symbol: str = None, resolution: Resolution = None, from_date: int = None, to_date: int = None
@@ -427,8 +430,8 @@ class AsyncClient(BaseClient):
     async def cancel_order(self, order_id: str) -> t.Dict:
         return await self._delete(f'account/orders', signed=True, json={'clientOrderId': order_id})
 
-    async def get_open_orders(self, symbol: str = None, side: str = None) -> t.Dict:
-        result = await self._get('account/openOrders', signed=True)
+    async def get_open_orders(self, symbol: str = None, side: str = None, page: int = 1) -> t.Dict:
+        result = await self._get('account/openOrders', signed=True, params={'page': page})
 
         if symbol is not None:
             data = self._pick(result.get('result').get('orders'), "symbol", symbol)
@@ -440,11 +443,14 @@ class AsyncClient(BaseClient):
 
         return result
 
-    async def get_user_recent_trades(self, symbol: str = None, side: str = None, active: bool = None) -> t.Dict:
+    async def get_user_recent_trades(
+            self, symbol: str = None, side: str = None, active: bool = None, page: int = 1
+    ) -> t.Dict:
         return await self._get('account/trades', signed=True, params={
             'symbol': symbol,
             'side': side,
-            'active': active
+            'active': active,
+            'page': page
         })
 
     async def get_order_status(self, order_id: str) -> t.Dict:

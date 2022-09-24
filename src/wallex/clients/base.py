@@ -158,7 +158,7 @@ class BaseClient(ABC):
         raise NotImplementedError('get_orderbook not implemented')
 
     @abstractmethod
-    def get_recent_trades(self, symbol: str = 'None', **kwargs) -> t.Dict:
+    def get_recent_trades(self, symbol: str = 'None', page: int = 1) -> t.Dict:
         raise NotImplementedError('get_recent_trades not implemented')
 
     @abstractmethod
@@ -246,11 +246,15 @@ class BaseClient(ABC):
         raise NotImplementedError('cancel_order not implemented')
 
     @abstractmethod
-    def get_open_orders(self, symbol: str = None, side: str = None) -> t.Dict:
+    def get_open_orders(
+            self, symbol: str = None, side: str = None, page: int = 1
+    ) -> t.Dict:
         raise NotImplementedError('get_open_orders not implemented')
 
     @abstractmethod
-    def get_user_recent_trades(self, symbol: str = None, side: str = None, active: bool = None) -> t.Dict:
+    def get_user_recent_trades(
+            self, symbol: str = None, side: str = None, active: bool = None, page: int = 1
+    ) -> t.Dict:
         raise NotImplementedError('get_user_recent_trades not implemented')
 
     @abstractmethod
