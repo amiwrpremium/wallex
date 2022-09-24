@@ -330,18 +330,14 @@ class AsyncClient(BaseClient):
     async def get_orderbook(self, symbol: str) -> t.Dict:
         return await self._get('depth', params={'symbol': symbol})
 
-    async def get_recent_trades(self, symbol: str = 'None', page: int = 1) -> t.Dict:
-        return await self._get('trades', params={'symbol': symbol, 'page': page})
+    async def get_recent_trades(self, symbol: str = None, page: int = 1) -> t.Dict:
+        return await self._get('trades', params=self._get_kwargs(locals(), del_nones=True))
 
     async def get_ohlc_data(
             self, symbol: str = None, resolution: Resolution = None, from_date: int = None, to_date: int = None
     ) -> t.Dict:
-        return await self._get('udf/history', params={
-            'symbol': symbol,
-            'resolution': resolution.value if resolution is not None else None,
-            'from': from_date,
-            'to': to_date
-        })
+        params = self._get_kwargs(locals(), del_nones=True)
+        return await self._get('udf/history', params=params)
 
     async def get_profile(self) -> t.Dict:
         return await self._get('account/profile', signed=True)
@@ -446,12 +442,8 @@ class AsyncClient(BaseClient):
     async def get_user_recent_trades(
             self, symbol: str = None, side: str = None, active: bool = None, page: int = 1
     ) -> t.Dict:
-        return await self._get('account/trades', signed=True, params={
-            'symbol': symbol,
-            'side': side,
-            'active': active,
-            'page': page
-        })
+        params = self._get_kwargs(locals(), del_nones=True)
+        return await self._get('account/trades', signed=True, params=params)
 
     async def get_order_status(self, order_id: str) -> t.Dict:
         return await self._get(f'account/orders/{order_id}', signed=True)
